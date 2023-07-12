@@ -1,0 +1,99 @@
+-- create table for drinks
+create table drinks (
+	drinks_id bigint
+	, item_name varchar(255)
+	, storage_type varchar(255)
+	, package_size int
+	, package_size_uom varchar(255)
+	, brand_name varchar(255)
+	, package_price decimal(10,2)
+	, price_last_updated_ts timestamp without time zone
+)
+;
+
+-- create table for foods
+create table foods (
+	food_id bigint
+	, item_name varchar(255)
+	, storage_type varchar(255)
+	, package_size int
+	, package_size_uom varchar(255)
+	, brand_name varchar(255)
+	, package_price decimal(10,2)
+	, price_last_updated_ts timestamp without time zone
+)
+;
+
+-- create table for food inventories
+create table food_inventories (
+	inventory_id int
+	, food_item_id int
+	, quantity int
+	, inventory_dt timestamp
+)
+;
+
+-- count the number of foods record
+
+select
+	count (*)
+from
+	foods
+
+-- move timestamp to first column
+select
+	f.price_last_updated_ts -- move this up!!
+  , f.food_id
+  , f.item_name
+  , f.storage_type
+  , f.package_size
+  , f.package_size_uom
+  , f.brand_name
+  , f.package_price
+from
+	foods f
+
+-- change name of package_size_uom to something not cryptic to users
+select
+    f.food_id
+  , f.item_name
+  , f.storage_type
+  , f.package_size
+  , f.package_size_uom as package_size_as_unit_of_measurement
+  , f.brand_name
+  , f.package_price
+  , f.price_last_updated_ts
+from
+	foods f
+where
+	brand_name ilike 'H-E-B (private label)'
+	-- filter down record to brand name as H-E-B
+
+-- find all the h-e-b private label items
+select
+    f.food_id
+  , f.item_name
+  , f.storage_type
+  , f.package_size
+  , f.package_size_uom as package_size_as_unit_of_measurement
+  , f.brand_name
+  , f.package_price
+  , f.price_last_updated_ts
+from
+	foods f
+where
+	upper(brand_name) = 'H-E-B (PRIVATE LABEL)'
+
+-- add column for is_canned_yn
+select
+    f.price_last_updated_ts
+  , f.food_id
+  , f.item_name
+  , f.storage_type
+  , f.package_size
+  , f.package_size_uom as package_size_unit_of_measurement
+  , f.brand_name
+  , f.package_price
+  , case when item_name ilike '%canned%' then 'Y' else 'N' end as is_canned_yn
+from
+	foods f
